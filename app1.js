@@ -20,7 +20,7 @@ var db    = mysql.createConnection({
     port     :  3306, // pas touche à ça : spécifique pour C9 !
     user     : 'root',  // vous pouvez mettre votre login à la place
     password : 'admin',
-    database : 'dbgames3'  // mettez ici le nom de la base de données
+    database : 'dbgames'  // mettez ici le nom de la base de données
 });
 
 
