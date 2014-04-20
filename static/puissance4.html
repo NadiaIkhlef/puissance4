@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Puissance 4</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/s/puissance4.css" type="text/css"/> 
+    <link rel="stylesheet" href="/s/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/s/bootstrap/css/bootstrap-theme.css">
+
+    <style>
+        .loader {
+            position:absolute;
+            top: 0;
+            left: 0;
+            width:100%;
+            height: 100%;
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+     
+</head>
+<body>
+    <div id="loader" class="loader">
+        <h4 id="loader-text"></h4>
+    </div>
+    <div class="maincontent" id="maincontent">
+     
+        <div class="panel panel-primary">
+            <div class="panel-heading">Puissance 4</div>
+            <div class="panel-body">
+                <div id="div1">
+                    <div id="plat"></div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div id="results">
+                    <div id="player1result" class="form-control" style="height:auto">
+                        <h3>
+                            <span id="player1Color" style='display:inline-block; width: 25px; height: 25px; border-radius:8em;'></span>
+                            <span id="player1Name"></span>
+                            <span id="player1Score" style="float:right"></span>
+                        </h3>
+                    </div>
+                    <div id="player2result" class="form-control" style="height:auto">
+                        <h3>
+                            <span id="player2Color" style='display:inline-block; width: 25px; height: 25px; border-radius:8em;' ></span>
+                            <span id="player2Name">  </span>
+                            <span id="player2Score" style="float:right"></span>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal fade play-invite-modal">
+                <div class="modal-dialog">
+                    <div class="modal-content modal-sm">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Recommencer...</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p id="dialogmsg"></p>
+                        </div>
+                        <div class="modal-footer modal-footer-sm">
+                            <button id="accept" type="button" class="btn btn-primary" data-dismiss="modal">Recommencer</button>
+                            <button id="reject" type="button" class="btn btn-primary" data-dismiss="modal">Quitter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+        <script src="/s/bootstrap/js/jquery-1.11.0.js"></script> 
+        <script src="/s/sonic.js"></script> 
+        <script src="/s/bootstrap/js/bootstrap.js"></script> 
+        <script src="/s/puissance4.js" type="text/javascript" ></script>
+        <script type="text/javascript" charset="utf-8" async defer>
+
+            var g1 = null;
+            function init(data) {
+                // initialisation de la zone du joueur 1;
+                $('#player1Name').text(data.player1.login);
+                $('#player1Score').text(data.player1.score);
+                $('#player1Color').css('background-color', data.player1.couleurprefere);
+
+                // initialisation de la zone du joueur 2;
+                $('#player2Name').text(data.player2.login);
+                $('#player2Score').text(data.player2.score);
+                $('#player2Color').css('background-color', data.player2.couleurprefere);
+
+                // definition de couleur des 2 joueurs
+                var style = $('<style type="text/css" media="screen">.joueur1{background-color:' + data.player1.couleurprefere + ';}.joueur2{background-color:' + data.player2.couleurprefere + '; }</style>');
+                $('html > head').append(style);
+
+                g1 = new Game4('#plat');
+                g1.player1 =data.player1.login;
+                g1.player2 = data.player2.login;
+                g1.player1parties = data.player1.parties;
+                g1.player2parties = data.player2.parties;
+                g1.player1score =data.player1.score;
+                g1.player2score = data.player2.score;
+                g1.partieid = data.partieid;
+                g1.turn = data.turn;
+
+                g1.startGame();
+                console.log('Game started..');
+            }
+
+            function exit() {
+                document.getElementById('exit').value = "true";
+                document.forms[0].submit();
+                g1.initGame();
+            };
+
+            window.onload = function () {
+                $('#maincontent').css('display', 'none');
+                wainting();
+                $.ajax({
+                    url: '/api/initplay/',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (e) {
+                        if (e.player1 && e.player2) {
+                            console.log('game loaded');
+                            $('#loader-text').text('Attente du joueur...');
+                            init(e);
+                        } else {
+                            alert('err');
+                        }
+                    }
+                });
+            };
+
+            function wainting() {
+                var circle = new Sonic({
+                    width: 50,
+                    height: 50,
+                    padding: 50,
+                    strokeColor: '#000',
+                    pointDistance: .01,
+                    stepsPerFrame: 3,
+                    trailLength: .7,
+                    step: 'fader',
+                    setup: function () {
+                        this._.lineWidth = 5;
+                    },
+                    path: [
+                        ['arc', 25, 25, 25, 0, 360]
+                    ]
+                });
+
+                circle.play();
+                $('#loader-text').text('Chargement de la partie');
+                document.getElementById('loader').appendChild(circle.canvas);
+            }
+       </script>
+   
+</body>
+</html>

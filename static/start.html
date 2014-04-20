@@ -1,0 +1,65 @@
+﻿<html>
+    <head>
+         <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/s/bootstrap/css/bootstrap.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="/s/bootstrap/css/bootstrap-theme.css">
+
+    <style type="text/css" media="screen">
+		.main-content{
+			margin-left: auto;
+			margin-right: auto;
+			width: 600px;
+        }  
+	</style>
+    </head>
+    <body>
+        <div class="main-content">
+        <form method="GET" action="/play">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+                Configuration de la partie
+            </div>
+            <div class="panel-body">
+                 <div>
+                     <h3>Joueur1</h3>               
+                     <div class="row">
+                         <div class="col-sm-6 required">
+                            <input class="form-control" type="text" name="player1Name" placeholder="nom du joeur" required/>
+                         </div>
+                         <div class="col-sm-4 required">
+                            <select class="form-control" name="player1Color">
+                                <option value="red">Rouge</option>
+                                <option value="yellow">Jaune</option>
+                                <option value="green">Vert</option>
+                            </select>
+                         </div>
+                     </div>
+                     <h3>Joueur2</h3>
+                     <div class="row">
+                         <div class="col-sm-6 required">
+                            <input class="form-control" type="text" name="player2Name" placeholder="nom du joeur" required/>
+                        </div>
+                         <div class="col-sm-4 required">
+                            <select class="form-control" name="player2Color">
+                                <option value="red">Rouge</option>
+                                <option value="yellow">Jaune</option>
+                                <option value="green">Vert</option>
+                            </select>
+                         </div>
+                    </div>
+                </div>     
+            </div>
+            <div class="panel-footer" style="height: 50px;">
+                 <div style="text-align: center;">
+                    <input type="submit" name="play" value="Demarrer la partie" class="btn btn-primary col-sm-12" />
+                 </div>
+            </div>
+          </div>   
+        </form>
+            <script src="/s/bootstrap/js/jquery-1.11.0.js"></script> 
+            <script src="/s/bootstrap/js/bootstrap.js"></script> 
+        </div>
+    </body>
+</html>

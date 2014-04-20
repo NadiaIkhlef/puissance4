@@ -1,0 +1,206 @@
+﻿<html>
+    <head>
+         <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="/s/bootstrap/css/bootstrap.css">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="/s/bootstrap/css/bootstrap-theme.css">
+        <title>Connection</title>
+        <style type="text/css" media="screen">
+		    .main-content{
+			    margin-left: auto;
+			    margin-right: auto;
+                width: 900px;
+            }  
+            td { 
+                 width:14em;
+                 height:3em;
+             }
+            .col-sm-12
+            {
+                width: 25%;
+                float: none;
+            }
+
+            #colorpreview1, #colorpreview2  {
+                width: 32px;
+                height: 32px;
+                display: block;
+                float: right;
+                padding-top: 1px;
+                padding-bottom: 1px;
+            }
+
+            #couleur1, #couleur2 {
+                float:left;
+                width: 192px;    
+            }
+
+    	</style>
+    </head>
+
+    <body>
+        <div class="main-content">
+            <form action="/login" method="post">
+                <div class="panel panel-primary">
+                   <div class="panel-heading">
+                       Se connecter
+                    </div>
+                    <div class="panel-body">
+                        <div >
+                            <table style="text-align:center">
+                                <datalist id="login">
+                                    {% for log in login %}
+                                    <option value="{{log.login}}">{{log.login}}</option>
+                                    {% endfor %}
+                                </datalist>
+                                <tr>
+                                    <td>
+                                        <div> <strong> Login:  </strong></div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <input class="form-control" type="text" name="login1" list="login" required/>
+                                        </div>
+                                    </td>  
+                                    <td>
+                                        <div> <strong> Mot de passe:</strong></div>
+                                    </td>
+                                    <td><input class="form-control" type="password" name="pass1"  required/></td>   
+                                </tr>
+                                
+                            </table>
+                        </div>
+                     </div>
+                    <div class="panel-footer" style="height: 50px;">
+                        <div style="text-align:right; width: 853px;">
+                              <input type="submit" name="login" value="Se connecter" class="btn btn-primary col-sm-12"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+             <form action="/signup" method="post" id="signup">
+                 <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            Inscription
+                        </div>
+                        <div class="panel-body">
+                            <div >
+                                <table>
+                                    <tr>
+                                        <td><div><strong> Nom: </strong></div></td>
+                                        <td><div><input class="form-control" type="text" name="name" required/></div></td>   
+                                    </tr>
+                                        <tr>
+                                        <td><div><strong> Prenom: </strong></div></td>
+                                        <td><div><input class="form-control" type="text" name="lastname" required/></div></td>   
+                                    </tr>
+                                    <tr>
+                                        <td><div><strong> Login: </strong></div></td>
+                                        <td><div><input class="form-control" type="text" name="login" required/></div></td>   
+                                    </tr>
+                                        <tr>
+                                        <td><div><strong>Mot de passe:</strong></div></td>
+                                        <td><div><input class="form-control" type="password" id="pass" name="pass" required/></div></td>   
+                                    </tr>
+                                    <tr>
+                                        <td><div><strong>Confirmer le mot de passe:</strong></div></td>
+                                        <td><div><input class="form-control" type="password" id="pass1" name="pass1" onfocus="validatePass(document.getElementById('pass'), this);" oninput="validatePass(document.getElementById('pass'), this);"/></div></td>   
+                                    </tr>
+                                        <tr>
+                                        <td><div><strong>Couleur préférée:</strong></div></td>
+                                        <td>
+                                            <div>
+                                                <select class="form-control" name="couleur1" id="couleur1">
+                                                    {% for key,color in colors %}
+					                                    <option value=" {{ colors[key] }}">{{ key }}</option>
+					                                {% endfor %}
+                                                    
+                                                </select>
+                                                <span style="width:32px;height:32px" id="colorpreview1"></span>
+
+                                            </div>
+                                        </td>   
+                                    </tr>
+                                    <tr>
+                                        <td><div><strong>Couleur secondaire:</strong></div></td>
+                                        <td>
+                                            <div>
+                                                <select class="form-control" name="couleur2" id="couleur2">
+                                                    {% for key,color in colors %}
+					                                    <option value=" {{ colors[key] }}">{{ key }}</option>
+					                                {% endfor %}
+                                                </select>
+                                                <span style="width:32px;height:32px" id="colorpreview2"></span>
+                                            </div>
+                                        </td>   
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel-footer" style="height: 50px;">
+                            <div style="text-align:right; width: 852px;">
+                                <input type="submit" name="sign" value="Enregistrer" class="btn btn-primary col-sm-12"/>
+                            </div>
+                        </div>
+                </div>
+              </form>
+        </div>
+    
+    <script src="/s/bootstrap/js/jquery-1.11.0.js"></script> 
+    <script src="/s/bootstrap/js/bootstrap.js"></script> 
+    <script type="text/javascript" charset="utf-8" defer>
+       
+       
+        // validate signup form on keyup and submit
+        function validatePass(p1, p2) {
+            if (p1.value != p2.value || p1.value == '' || p2.value == '') {
+                p2.setCustomValidity('Password incorrect');
+            } else {
+                p2.setCustomValidity('');
+            }
+        }
+
+        function DisbleOption(select, val) {
+            for (var i = 0; i < select.options.length; i++) {
+                var opt = select.options[i];
+                if (opt.value == val) {
+                    opt.disabled = true;
+                    opt.className = 'disabled';
+                } else {
+                    opt.disabled = false;
+                    opt.className = '';
+                }
+            };
+        }
+
+        function generateColor(el) {
+            var colorcount = el.options.length;
+            var rdindex = Math.floor(Math.random() * colorcount);
+            el.selectedIndex = rdindex;
+            // Fire change event
+            el.onchange(el);
+        }
+
+        document.getElementById('couleur1').onchange = function (e) {
+            document.getElementById('colorpreview1').style.backgroundColor = this.value;
+
+            // Disable the selected color for the other player
+            var sel = document.getElementById('couleur2');
+            DisbleOption(sel, this.value);
+        }
+
+        document.getElementById('couleur2').onchange = function (e) {
+            document.getElementById('colorpreview2').style.backgroundColor = this.value;
+            // Disable the selected color for the other player
+            var sel = document.getElementById('couleur1');
+            DisbleOption(sel, this.value);
+        }
+
+        // Set default color for each element
+        generateColor(document.getElementById('couleur1'))
+        generateColor(document.getElementById('couleur2'))
+
+	</script>
+    </body>
+    
+</html>

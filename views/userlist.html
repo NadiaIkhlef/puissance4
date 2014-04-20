@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Liste des utilisateurs</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--><link rel="stylesheet" href="/s/hello.css" type="text/css"/></-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/s/bootstrap/css/bootstrap.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="/s/bootstrap/css/bootstrap-theme.css">
+    <style>
+        #color {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        .nav > li {
+            float: left;
+        }
+
+        .nav {
+            float: right;
+        }
+
+        .table tbody tr.error > td {
+            background-color: #F2DEDE;
+        }
+
+        .table tbody tr.info > td {
+            background-color: #d9edf7;
+        }
+
+        .table tbody tr.success > td {
+            background-color: #dff0d8;
+        }
+
+        .navbar {
+            background-color: rgb(240,240,240);
+        }
+
+        .modal-footer-sm {
+            padding: 5px 0px;
+            text-align: center; 
+        }
+        .modal-header {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-inner">
+            <ul class="nav">
+                <li><a href="#"><span id="user-login"></span></a></li>
+                <li><a href="#"><span id="color"></span></a></li>
+                <li><a href="#"><span id="partie" class="badge"></span></a></li>
+                <li><a href="/logout"><span class="glyphicon glyphicon-off"></span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h4>Liste des utilisateurs connectes </h4>
+            </div>
+            <div class="panel-body">
+                <div id="usersconnect">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="invitations">
+    </div>
+
+    <div class="modal fade play-invite-modal">
+        <div class="modal-dialog">
+            <div class="modal-content modal-sm">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Invitation...</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="dialogmsg"></p>
+                </div>
+                <div class="modal-footer modal-footer-sm">
+                    <button id="accept" type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-ok"></span></button>
+                    <button id="reject" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-remove"></span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/s/bootstrap/js/jquery-1.11.0.js"></script>
+    <script src="/s/bootstrap/js/bootstrap.js"></script>
+    <script>
+
+        var evt = new EventSource('/api/userlist');
+        evt.addEventListener('updateusers', function (e) {
+            console.log(e.data);
+            var data = JSON.parse(e.data);
+            $("#usersconnect").html('<table class="table"><tr><th>Joueur</th><th>Parties</th><th>Gagnees</th><th>Couleur</th><th>Action</th></tr></table>');
+
+            data.users = data.users.sort(function (a, b) {
+                return a.busy ? false : true;
+            });
+
+            for (var i = 0 ; i < data.users.length ; i++) {
+                var tr = $('<tr id="' + data.users[i].login + '"></tr>');
+                tr.append('<td><a href="#" class="login" >' + data.users[i].login + '</a></td>');
+                tr.append('<td>' + data.users[i].parties + '</td>');
+                tr.append('<td>' + data.users[i].gagnees + '</td>');
+                tr.append('<td><span style=" width: 55px; height: 30px; display:block; background-color:' + data.users[i].couleur1 + '"></span></td>');
+                tr.append('<td><div id="' + data.users[i].login +'_actions"></div></td>');
+                $("#usersconnect>table").append(tr);
+
+                if (data.users[i].busy)
+                    $('#' + data.users[i].login).addClass('error');
+
+            }
+
+            // Mettre a jour lutilisateur en cours
+            $('#user-login').text(data.me.login);
+            $('#color').css('background-color', data.me.couleur1);
+            $('#partie').text(data.me.gagnees + '/' + data.me.parties);
+
+            $('.login').click(function (e) {
+                var userlogin = $(e.target).text();
+                console.log('invite : ' + userlogin);
+                $.ajax({
+                    url: '/api/challenge/' + userlogin,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (e) {
+                        if (e.id !== 'undefined') {
+                           
+                            $('#' + userlogin + '_actions').text('En attente...');
+                            $('#' + userlogin).addClass('success');
+
+                        } else {
+                            alert('erreur');
+                        }
+                    }
+                });
+                e.preventDefault();
+            });
+
+        });
+
+        evt.addEventListener('invitation', function (e) {
+            var partie = JSON.parse(e.data);
+            
+            $('#' + partie.challenger).addClass('info');
+            var acceptbtn = $('<a href="#" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></a>');
+            var action = $('#' + partie.challenger + '_actions');
+
+            action.append(acceptbtn);
+            var acceptevent = function () {
+                $.ajax({
+                    url: '/api/accept/' + partie.id,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (e) {
+                        $('#' + e.id).remove();
+                        $('#' + partie.challenger + '_actions').children().remove();
+                        window.location = '/play?partieid=' + e.id;
+                    }
+                });
+
+                e.preventDefault();
+            };
+
+            acceptbtn.click(acceptevent);
+
+            var rejectbtn = $('<a href="#" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></a>');
+            action.append(rejectbtn);
+            var rejectevent = function () {
+                $.ajax({
+                    url: '/api/reject/' + partie.id,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (e) {
+                        $('#' + e.id).remove();
+                        $('#' + partie.challenger + '_actions').children().remove();
+                        $('#' + partie.challenger).removeClass('info');
+                    }
+                });
+                
+                e.preventDefault();
+            };
+
+            rejectbtn.click(rejectevent);
+        });
+
+        evt.addEventListener('reponseinvitation', function (e) {
+            var data = JSON.parse(e.data);
+            if (data.statut === 'Rejet') {
+                alert(data.user + ' a refuse la partie.');
+                $('#' + data.user).removeClass('success');
+                $('#' + data.user+'_actions').text('');
+
+            } else if (data.statut === 'Accept') {
+                console.log(data.user + ' a accepter la partie. vous allez etre redirige vers la partie');
+                window.location = '/play?partieid=' + data.id;
+            }
+        });
+
+    </script>
+</body>
+</html>

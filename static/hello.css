@@ -1,0 +1,8 @@
+﻿.td { 
+     border-width:1px;
+     border-style:solid; 
+     border-color:blue;
+     width:5em;
+     height:5em;
+     background-color:white;
+ }
