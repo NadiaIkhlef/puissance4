@@ -1,6 +1,6 @@
-CREATE DATABASE dbgames1;
+CREATE DATABASE dbgames;
 
-USE dbgames1;
+USE dbgames;
 
 CREATE TABLE `users` (
   `login` varchar(255) NOT NULL,
